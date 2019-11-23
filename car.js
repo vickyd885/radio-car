@@ -16,6 +16,7 @@ let ax = 0
 let forward = true
 let speedRight = 0
 let speedLeft = 0
+let motorRotation = maqueen.Dir.CW
 
 function getRotation(dir: boolean) {
     return dir ? maqueen.Dir.CW : maqueen.Dir.CCW;
@@ -82,14 +83,16 @@ radio.onReceivedString(function (receivedString: string) {
          *
          * getRotation(direction) returns the required rotation depending if the user 
          * wants to go. The direction works seamlessy with the maths described above
-         * to achieve realstic reverse motion.
+         * to achieve realistic reverse motion.
          */
 
         speedLeft = Math.map(ax, -1023, 1023, 0, 100)
         speedRight = Math.map(1023 - ax, 0, 2046, 0, 100)
-
-        maqueen.MotorRun(maqueen.aMotors.M1, getRotation(forward), speedLeft)
-        maqueen.MotorRun(maqueen.aMotors.M2, getRotation(forward), speedRight)
+        
+        motorRotation = getRotation(forward)
+        
+        maqueen.MotorRun(maqueen.aMotors.M1, motorRotation, speedLeft)
+        maqueen.MotorRun(maqueen.aMotors.M2, motorRotation, speedRight)
 
     }
 })
