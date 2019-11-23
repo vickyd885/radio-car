@@ -2,8 +2,8 @@
  *
  * The car responds to two commands
  * - Left Button Press (which acts like a toggle between going forward and backwards)
- * - Right Button Press (which acts like a break and horns)
- * Otherwise, the car continues in the direction of travel, steering left or right
+ * - Right Button Press (which stops or starts the robot and makes a buzzing sound)
+ * If activated, car continues in the direction of travel, steering left or right
  * depending on the accelerometer of the remote Microbit.
  *
  * The mathematics of the steering mechanism is described in the code below.
@@ -13,6 +13,7 @@
 radio.setGroup(1)
 
 let ax = 0
+let moving = true
 let forward = true
 let speedRight = 0
 let speedLeft = 0
@@ -26,10 +27,15 @@ radio.onReceivedString(function (receivedString: string) {
     if (receivedString == "A") {
         forward = !forward
     } else if (receivedString == "B") {
-        maqueen.motorStopAll()
-        music.playTone(Note.C, 100)
-        basic.pause(100)
+        moving = !moving
+        if (!moving) {
+            maqueen.motorStopAll()
+            music.playTone(Note.C, 100)
+            basic.pause(1000)
+        }
     } else {
+        if (!moving) return;
+
         ax = parseInt(receivedString)
         /*
          * ax is the tilt of the controller, which ranges from 
@@ -88,9 +94,9 @@ radio.onReceivedString(function (receivedString: string) {
 
         speedLeft = Math.map(ax, -1023, 1023, 0, 100)
         speedRight = Math.map(1023 - ax, 0, 2046, 0, 100)
-        
+
         motorRotation = getRotation(forward)
-        
+
         maqueen.MotorRun(maqueen.aMotors.M1, motorRotation, speedLeft)
         maqueen.MotorRun(maqueen.aMotors.M2, motorRotation, speedRight)
 
